@@ -1,4 +1,4 @@
-from rest_framework import generics,status
+from rest_framework import generics,status,mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product
@@ -43,6 +43,16 @@ class ProductDestroyAPTView(generics.DestroyAPIView):
 
     def perform_destroy(self,instance):
         super().perform_destroy(instance)
+
+class ProductMixinView(
+    mixins.ListModelMixin,
+    generics.GenericAPIView
+):
+    query_set = Product.objects.all()
+    serializer_class = ProductSerializer
+    def get(self,request, *args, **kwargs):
+        return list(request,*args,**kwargs)
+
 
 @api_view(["GET","POST"])
 def product_alt_view(request,pk=None,*args,**kwargs):
