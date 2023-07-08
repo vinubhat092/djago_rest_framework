@@ -15,12 +15,11 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         if content is None:
             content = title
 
-        
-
         serializer.save(content = content)
 
 
 class ProductDetailAPTView(generics.RetrieveAPIView):
+    
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -45,13 +44,24 @@ class ProductDestroyAPTView(generics.DestroyAPIView):
         super().perform_destroy(instance)
 
 class ProductMixinView(
+    mixins.CreateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     generics.GenericAPIView
-):
-    query_set = Product.objects.all()
+):                                                        #clsss based views with mixins which has many builtin packages handy
+    print("jfkefe")
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    def get(self,request, *args, **kwargs):
-        return list(request,*args,**kwargs)
+    lookup_field = 'pk'
+    def get(self,request, *args, **kwargs):   
+        print("effe",args,kwargs)
+        pk = kwargs.get("pk")
+        if pk is not None:
+            return self.retrieve(request,*args,**kwargs)             #no need of seperatly writing condition for post and get, directl ryt func with get or post
+        return self.list(request,*args,**kwargs)
+    def post(self,request,*args,**kwargs):
+        return self.create(request,*args,**kwargs)
+
 
 
 @api_view(["GET","POST"])
