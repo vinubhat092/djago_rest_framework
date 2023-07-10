@@ -1,17 +1,22 @@
-from rest_framework import generics,status,mixins
+from rest_framework import generics,status,mixins,permissions,authentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product
 from .serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
+from .permissions import IsStaffEditorPermission
 class ProductListCreateAPIView(generics.ListCreateAPIView):
+    print("dsdfe")
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [IsStaffEditorPermission]      #we can use decorators for permissions in func based view(IsAuthenticatedOrReadOnly,DjangoModelPermissions)
     def perform_create(self,serializer):
+        print("dsds")
         print(serializer.validated_data)
         title = serializer.validated_data.get('title')
         content = serializer.validated_data.get('content') or None
-
+        
         if content is None:
             content = title
 
