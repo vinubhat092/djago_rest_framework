@@ -5,11 +5,13 @@ from .models import Product
 from .serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
 from .permissions import IsStaffEditorPermission
+from api.authentication import TokenAuthentication
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     print("dsdfe")
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [authentication.SessionAuthentication,
+                              TokenAuthentication]
     permission_classes = [IsStaffEditorPermission]      #we can use decorators for permissions in func based view(IsAuthenticatedOrReadOnly,DjangoModelPermissions)
     def perform_create(self,serializer):
         print("dsds")
