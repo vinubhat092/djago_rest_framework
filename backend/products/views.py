@@ -4,15 +4,18 @@ from rest_framework.response import Response
 from .models import Product
 from .serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
-from .permissions import IsStaffEditorPermission
+from api.permissions import IsStaffEditorPermission
 from api.authentication import TokenAuthentication
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+from api.mixins import StaffEditorPermissionMixin
+class ProductListCreateAPIView(
+    StaffEditorPermissionMixin,
+    generics.ListCreateAPIView):
     print("dsdfe")
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication,
-                              TokenAuthentication]
-    permission_classes = [IsStaffEditorPermission]      #we can use decorators for permissions in func based view(IsAuthenticatedOrReadOnly,DjangoModelPermissions)
+    # authentication_classes = [authentication.SessionAuthentication,
+    #                           TokenAuthentication]
+    # permission_classes = [IsStaffEditorPermission]      #we can use decorators for permissions in func based view(IsAuthenticatedOrReadOnly,DjangoModelPermissions)
     def perform_create(self,serializer):
         print("dsds")
         print(serializer.validated_data)
@@ -25,12 +28,11 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(content = content)
 
 
-class ProductDetailAPTView(generics.RetrieveAPIView):
-    
+class ProductDetailAPTView(StaffEditorPermissionMixin,generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-class ProductUpdateAPTView(generics.UpdateAPIView):
+class ProductUpdateAPTView(StaffEditorPermissionMixin,generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = "pk"
@@ -43,7 +45,7 @@ class ProductUpdateAPTView(generics.UpdateAPIView):
 
 
 
-class ProductDestroyAPTView(generics.DestroyAPIView):
+class ProductDestroyAPTView(StaffEditorPermissionMixin,generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
